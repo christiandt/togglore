@@ -1,6 +1,5 @@
 import urllib
-import urllib.request
-import urllib.parse
+import requests
 import base64
 import json
 
@@ -15,7 +14,7 @@ class TogglClient(object):
 
     def __init_headers(self):
         auth_header = self.api_token + ":" + "api_token"
-        auth_header = "Basic {}".format(base64.b64encode(bytes(auth_header, "utf-8")).decode("ascii"))
+        auth_header = "Basic {}".format(base64.b64encode(bytes(auth_header).decode("ascii")))
         self.headers = {
             "Authorization": auth_header,
             "Content-Type": "application/json",
@@ -25,14 +24,12 @@ class TogglClient(object):
 
     def request(self, endpoint, parameters=None):
         if parameters is not None:
-            url = '{}?{}'.format(endpoint, urllib.parse.urlencode(parameters))
+            url = '{}?{}'.format(endpoint, urllib.urlencode(parameters))
         else:
             url = endpoint
 
-        req = urllib.request.Request(url, headers=self.headers)
-        response = urllib.request.urlopen(req).read()
-
-        return json.loads(response.decode('utf8'))
+        response = requests.get(url, headers=self.headers)
+        return json.loads(response.text)
 
     def time_entries(self, date_range):
         entries = []
